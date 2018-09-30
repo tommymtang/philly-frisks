@@ -1,15 +1,56 @@
 import pandas as pd
+import numpy as np
 
 stopcode_colname = 'stopcode'
+individual_frisk_colname = 'individual_frisked'
+illegal_vals = {'lng' : np.nan}
 
-def filter_pedestrians(df):
+def get_pedestrian_stops(df):
     ped_code = 2701
     return filter(df, stopcode_colname, ped_code)
 
-def filter_vehicles(df):
+def get_vehicle_stops(df):
     vehicle_code = 2702
     return filter(df, stopcode_colname, vehicle_code)
 
+def get_individual_frisk_stops(df):
+    was_frisked_code = 1
+    return filter(df, individual_frisk_colname, was_frisked_code)
+
+def remove_lng_illegal_vals(df):
+    lng_colname = 'lng'
+    return remove_rows_with_any_nan(df, lng_colname)
+
+def remove_lat_illegal_vals(df):
+    lat_colname = 'lat'
+    return remove_rows_with_any_nan(df, lat_colname)
+
+def remove_x_illegal_vals(df):
+    x_colname = 'point_x'
+    return remove_rows_with_any_nan(df, x_colname)
+
+def remove_y_illegal_vals(df):
+    y_colname = 'point_y'
+    return remove_rows_with_any_nan(df, y_colname)
+
+def remove_district_illegal_vals(df):
+    district_colname = 'districtoccur'
+    return remove_rows_with_any_nan(df, district_colname)
+
+def remove_psa_illegal_vals(df):
+    psa_colname = 'psa'
+    return remove_rows_with_any_nan(df, psa_colname)
+
+def remove_gender_illegal_vals(df):
+    gender_colname = 'gender'
+    return remove_rows_with_any_nan(df, gender_colname)
+
+def remove_age_illegal_vals(df):
+    age_colname = 'age'
+    return remove_rows_with_any_nan(df, age_colname)
+
+def remove_rows_with_any_nan(df, colnames):
+    return df.dropna(subset=[colnames])
 
 def filter(df, col_name, filter_val):
     return df.loc[df[col_name] == filter_val]
