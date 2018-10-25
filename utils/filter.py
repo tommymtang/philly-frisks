@@ -50,7 +50,17 @@ def remove_age_illegal_vals(df):
     return remove_rows_with_any_nan(df, age_colname)
 
 def remove_rows_with_any_nan(df, colnames):
-    return df.dropna(subset=[colnames])
+    if not type(colnames) is list:
+        colnames = [colnames]
+    return df.dropna(subset=colnames, how = 'any')
+
+def all_filters_for_input(df):
+    df_frisks = get_individual_frisk_stops(df) # filter out only frisk stops
+    df_frisks_ped = get_pedestrian_stops(df_frisks) # filter out only pedestrian frisk stops
+    remove_nan_colnames = ['lng', 'lat', 'point_x', 'point_y', 'districtoccur',\
+                                'psa', 'gender', 'age']
+    return remove_rows_with_any_nan(df_frisks_ped, remove_nan_colnames)
+
 
 def filter(df, col_name, filter_val):
     return df.loc[df[col_name] == filter_val]
