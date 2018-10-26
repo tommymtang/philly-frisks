@@ -60,7 +60,7 @@ def local_hit_rate_input_to_indicator_map(local_hit_rate_input, dilution=1000):
     indicator_map[row_indices, col_indices] = 1
     return indicator_map
 
-def get_local_hit_rate_map(local_hit_rate_input, sig = 12):
+def get_local_hit_rate_map(local_hit_rate_input, sig = 8):
     success_map = local_hit_rate_input_to_success_map(local_hit_rate_input)
     indicator_map = local_hit_rate_input_to_indicator_map(local_hit_rate_input)
     blurred_success = gaussian_filter(success_map, sigma=sig)
