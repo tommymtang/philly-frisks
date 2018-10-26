@@ -146,7 +146,14 @@ class TestPreprocessMethods(unittest.TestCase):
         local_hit_rate_input_num_hits = np.sum(local_hit_rate_input[:,2])
         print(local_hit_rate_input_num_hits)
         print(success_map_num_hits)
-    
+
+    def test_local_hit_rates_from_map_gives_correct_shape(self):
+        local_hit_rate_input = ppr.get_local_hit_rate_input(df_test_local_hit_rate)
+        local_hit_rate_map = ppr.get_local_hit_rate_map(local_hit_rate_input)
+        points = ppr.local_hit_rate_input_to_map_coordinates(local_hit_rate_input)
+        lhr_column = ppr.local_hit_rates_from_map(local_hit_rate_map, points)
+        assert (lhr_column.shape[0] == local_hit_rate_input.shape[0])
+
 
 
 if __name__ == '__main__':
