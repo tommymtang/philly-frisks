@@ -28,7 +28,7 @@ def get_map_limits(local_hit_rate_input, dilution=1000):
             'min_y' : min_y,
             'max_y' : max_y}
 
-def local_hit_rate_input_to_success_map(local_hit_rate_input, dilution=1000):
+def get_success_map(local_hit_rate_input, dilution=1000):
     row_column_id = 1
     col_column_id = 0
     success_values_column_index = 2
@@ -36,7 +36,7 @@ def local_hit_rate_input_to_success_map(local_hit_rate_input, dilution=1000):
     map_limits = get_map_limits(local_hit_rate_input)
     success_map = initialize_map(map_limits)
 
-    points = local_hit_rate_input_to_map_coordinates(local_hit_rate_input)
+    points = get_map_coordinates(local_hit_rate_input)
     row_indices = points[:, row_column_id]
     col_indices = points[:, col_column_id]
 
@@ -46,14 +46,14 @@ def local_hit_rate_input_to_success_map(local_hit_rate_input, dilution=1000):
     success_map[row_indices, col_indices] = success_values
     return success_map
 
-def local_hit_rate_input_to_indicator_map(local_hit_rate_input, dilution=1000):
+def get_indicator_map(local_hit_rate_input, dilution=1000):
     row_column_id = 1
     col_column_id = 0
 
     map_limits = get_map_limits(local_hit_rate_input)
     indicator_map = initialize_map(map_limits)
 
-    points = local_hit_rate_input_to_map_coordinates(local_hit_rate_input)
+    points = get_map_coordinates(local_hit_rate_input)
     row_indices = points[:, row_column_id].copy()
     col_indices = points[:, col_column_id].copy()
 
@@ -61,10 +61,10 @@ def local_hit_rate_input_to_indicator_map(local_hit_rate_input, dilution=1000):
     return indicator_map
 
 def get_local_hit_rate_map(local_hit_rate_input, sig = 8):
-    success_map = local_hit_rate_input_to_success_map(local_hit_rate_input)
-    indicator_map = local_hit_rate_input_to_indicator_map(local_hit_rate_input)
-    blurred_success = gaussian_filter(success_map, sigma=sig)
-    blurred_indicator = gaussian_filter(indicator_map, sigma=sig)
+    success_map = get_success_map(local_hit_rate_input)
+    indicator_map = get_indicator_map(local_hit_rate_input)
+    blurred_success = np.nan_to_num(gaussian_filter(success_map, sigma=sig))
+    blurred_indicator = np.nan_to_num(gaussian_filter(indicator_map, sigma=sig))
     return np.divide(blurred_success, blurred_indicator)
 
 def initialize_map(map_limits):
@@ -77,14 +77,14 @@ def initialize_map(map_limits):
     width = max_x - min_x + offset
     return np.zeros([height, width])
 
-def local_hit_rates_from_map(local_hit_rate_map, points):
+def get_local_hit_rates(local_hit_rate_map, points):
     x_col_id = 0
     y_col_id = 1
     col_indices = points[:,x_col_id].copy()
     row_indices = points[:,y_col_id].copy()
     return local_hit_rate_map[row_indices, col_indices]
 
-def local_hit_rate_input_to_map_coordinates(local_hit_rate_input, dilution=1000):
+def get_map_coordinates(local_hit_rate_input, dilution=1000):
     point_indices = [0,1]
     point_x_column_index = 0
     point_y_column_index = 1
@@ -102,7 +102,7 @@ def add_local_hit_rate(df):
     assert not df.isnull().values.any()
     lhr_input = get_local_hit_rate_input(df)
     lhr_map = np.nan_to_num(get_local_hit_rate_map(lhr_input))
-    points = local_hit_rate_input_to_map_coordinates(lhr_input)
-    lhr = local_hit_rates_from_map(lhr_map, points)
+    points = get_map_coordinates(lhr_input)
+    lhr = get_local_hit_rates(lhr_map, points)
     df['local_hit_rate'] = lhr
     return df

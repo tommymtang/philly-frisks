@@ -54,7 +54,7 @@ def remove_rows_with_any_nan(df, colnames):
         colnames = [colnames]
     return df.dropna(subset=colnames, how = 'any')
 
-def all_filters_for_input(df):
+def filter_for_input_all(df):
     df_frisks = get_individual_frisk_stops(df) # filter out only frisk stops
     df_frisks_ped = get_pedestrian_stops(df_frisks) # filter out only pedestrian frisk stops
     remove_nan_colnames = ['lng', 'lat', 'point_x', 'point_y', 'districtoccur',\

@@ -84,7 +84,7 @@ class TestFilterMethods(unittest.TestCase):
         subset_with_illegal_vals_removed = ft.remove_age_illegal_vals(df)
         assert(not subset_with_illegal_vals_removed['age'].isna().values.any())
 
-df_no_nans = ft.all_filters_for_input(df)
+df_no_nans = ft.filter_for_input_all(df)
 df_test_local_hit_rate = ppr.add_success_column(df_no_nans)
 
 class TestPreprocessMethods(unittest.TestCase):
@@ -121,7 +121,7 @@ class TestPreprocessMethods(unittest.TestCase):
 
     def test_local_hit_rate_input_to_success_map_gives_correct_shape(self):
         local_hit_rate_input = ppr.get_local_hit_rate_input(df_test_local_hit_rate)
-        success_map = ppr.local_hit_rate_input_to_success_map(local_hit_rate_input)
+        success_map = ppr.get_success_map(local_hit_rate_input)
         dilution = 1000
         point_x = local_hit_rate_input[:,0]*dilution
         point_y = local_hit_rate_input[:,1]*dilution
@@ -141,7 +141,7 @@ class TestPreprocessMethods(unittest.TestCase):
     def test_local_hit_rate_input_to_success_map_gives_correct_number_of_hits(self):
 
         local_hit_rate_input = ppr.get_local_hit_rate_input(df_test_local_hit_rate)
-        success_map = ppr.local_hit_rate_input_to_success_map(local_hit_rate_input)
+        success_map = ppr.get_success_map(local_hit_rate_input)
         success_map_num_hits = np.sum(success_map)
         local_hit_rate_input_num_hits = np.sum(local_hit_rate_input[:,2])
         print(local_hit_rate_input_num_hits)
@@ -150,8 +150,8 @@ class TestPreprocessMethods(unittest.TestCase):
     def test_local_hit_rates_from_map_gives_correct_shape(self):
         local_hit_rate_input = ppr.get_local_hit_rate_input(df_test_local_hit_rate)
         local_hit_rate_map = ppr.get_local_hit_rate_map(local_hit_rate_input)
-        points = ppr.local_hit_rate_input_to_map_coordinates(local_hit_rate_input)
-        lhr_column = ppr.local_hit_rates_from_map(local_hit_rate_map, points)
+        points = ppr.get_map_coordinates(local_hit_rate_input)
+        lhr_column = ppr.get_local_hit_rates(local_hit_rate_map, points)
         assert (lhr_column.shape[0] == local_hit_rate_input.shape[0])
 
 
