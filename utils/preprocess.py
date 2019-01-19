@@ -4,6 +4,12 @@ import math
 import scipy as sp
 from scipy.ndimage import gaussian_filter
 
+import tensorflow as tf
+from tensorflow import keras
+from keras.utils import to_categorical
+import datetime as dt
+import time
+
 def add_success_column(df):
     frisk_colname = 'individual_frisked'
     contraband_colname = 'individual_contraband'
@@ -105,4 +111,37 @@ def add_local_hit_rate(df):
     points = get_map_coordinates(lhr_input)
     lhr = get_local_hit_rates(lhr_map, points)
     df['local_hit_rate'] = lhr
+    return df
+
+# for bucketizing (categorizing) datetime data, age data
+
+def bucketize_timeoccur(time_occur, num_buckets = 8):
+    num_hours_bucket = 24 / num_buckets
+    bucket_iterator = pd.Timedelta(hours=num_hours_bucket)
+    for ibucket in range(num_buckets):
+        ibucket_time = (dt.datetime.min + ibucket * bucket_iterator).time()
+        if time_occur < ibucket_time:
+            return ibucket
+    return num_buckets
+
+def bucketize_timeoccur_series(time_occur_series, num_buckets = 8):
+    # works on a series (pandas dataframe column) that is the time of a datetime object
+    return time_occur_series.apply(bucketize_timeoccur, args = (num_buckets,)) # now compatible as input to map_categorical_to_onehot
+
+def add_month_column(df):
+    dt_colname = 'datetimeoccur'
+    month_colname = 'month'
+    dt_column = pd.to_datetime(df[dt_colname])
+    month_occur = dt_column.copy().dt.month
+    df['month'] = month_occur
+    return df
+
+def add_timeoccur_column(df, num_buckets = 8):
+    # adds as categorical
+    dt_colname = 'datetimeoccur'
+    timeoccur_colname = 'timeoccur'
+    dt_column = pd.to_datetime(df[dt_colname])
+    time_column = dt_column.copy().dt.time
+    timeoccur_cat_column = bucketize_timeoccur_series(time_column, num_buckets)
+    df['timeoccur'] = timeoccur_cat_column
     return df
