@@ -154,7 +154,10 @@ class TestPreprocessMethods(unittest.TestCase):
         lhr_column = ppr.get_local_hit_rates(local_hit_rate_map, points)
         assert (lhr_column.shape[0] == local_hit_rate_input.shape[0])
 
+class TestInputMethods(unittest.TestCase):
 
+    def test_map_categorical_to_onehot(self):
+        
 
 if __name__ == '__main__':
     unittest.main()
